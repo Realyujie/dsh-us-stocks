@@ -43,6 +43,16 @@ Reproduce with `npm run benchmark`, optionally against another ticker: `npm run 
 dsh plugin --profile web add dsh-us-stocks
 ```
 
+### The lazy way
+
+Or just say it to your DeepSeek Harness:
+
+```
+Install this plugin: https://github.com/Realyujie/dsh-us-stocks
+```
+
+The agent reads this README and runs the command itself. It will ask for filesystem permission on the way, because the profile directory sits outside the session workspace.
+
 To update later:
 
 ```bash
