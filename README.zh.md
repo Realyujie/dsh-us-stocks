@@ -51,9 +51,19 @@ Acceptance benchmark — AAPL
 
 ### 手动安装
 
+若 `dsh` 已在 `PATH` 中：
+
 ```bash
 dsh plugin --profile web add dsh-us-stocks
 ```
+
+若不在——通过 `npx` 启动 Harness 时即属此种情况，因为可执行文件只存在于 npx 缓存中——改用 `npx` 调用：
+
+```bash
+npx @deepseek-ai/dsh plugin --profile web add dsh-us-stocks
+```
+
+下文所有命令同理：把 `dsh` 换成 `npx @deepseek-ai/dsh` 前缀即可；或用 `npm install -g @deepseek-ai/dsh` 全局安装一次，之后统一使用简写形式。
 
 后续更新：
 

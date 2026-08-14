@@ -51,9 +51,19 @@ The agent reads this README and runs the command itself. It will ask for filesys
 
 ### By hand
 
+If `dsh` is on your `PATH`:
+
 ```bash
 dsh plugin --profile web add dsh-us-stocks
 ```
+
+If it is not — which is the case when Harness was started through `npx`, since the binary then only exists in the npx cache — call it through `npx` instead:
+
+```bash
+npx @deepseek-ai/dsh plugin --profile web add dsh-us-stocks
+```
+
+Every command below works the same way: prefix it with `npx @deepseek-ai/dsh` in place of `dsh`, or install the CLI globally once with `npm install -g @deepseek-ai/dsh` and use the short form throughout.
 
 To update later:
 
