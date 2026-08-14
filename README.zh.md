@@ -39,19 +39,21 @@ Acceptance benchmark — AAPL
 
 ## 安装
 
-```bash
-dsh plugin --profile web add dsh-us-stocks
-```
-
 ### 懒人版
 
-或者直接对你的 DeepSeek Harness 说：
+直接对你的 DeepSeek Harness 说：
 
 ```
 安装一下这个插件：https://github.com/Realyujie/dsh-us-stocks
 ```
 
 它会读这份 README 并自行执行安装命令。过程中会请求文件系统权限，因为 profile 目录在会话工作区之外。
+
+### 手动安装
+
+```bash
+dsh plugin --profile web add dsh-us-stocks
+```
 
 后续更新：
 
