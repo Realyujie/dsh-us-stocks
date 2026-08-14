@@ -1,0 +1,5 @@
+# DSH US stock market bundle patch. Server-side only — this plugin registers
+# agent tools and ships no browser half.
+- insert:
+    - id: us-stocks
+      name: dsh-us-stocks

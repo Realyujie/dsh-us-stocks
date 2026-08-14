@@ -1,0 +1,8 @@
+node_modules/
+lib/
+.build/
+*.tgz
+.DS_Store
+
+# Development notes, not part of the published package
+PLANNING.md
