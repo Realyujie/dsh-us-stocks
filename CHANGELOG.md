@@ -35,6 +35,12 @@ All notable changes to this project are documented here. The format follows
   cannot be derived from it. Each note appears only when the field it
   qualifies does — commodity and bond funds report no holdings at all.
 
+  `fund_trailing_returns_percent` names its own convention: upstream reports
+  `ytd` through `one_year` as the return over that window but annualises
+  everything longer, so those keys end in `_annualized`. Verified against SPY,
+  whose reported five-year 12.76% is the annualised form of an 83.95%
+  cumulative — read as cumulative it is wrong by a factor of four.
+
 ### Fixed
 
 - `get_analyst_view` relayed upstream's "No fundamentals data found for

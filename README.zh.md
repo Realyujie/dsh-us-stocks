@@ -129,6 +129,7 @@ dsh plugin --profile web add link:/absolute/path/to/dsh-us-stocks
 
 - 对基金而言，`trailing_pe`、`price_to_book`、`book_value_per_share`、`eps_trailing_twelve_months` 是成分股的加权聚合值，不是某一家公司的数据。不加标注时会被当成对该基金的估值判断。
 - 费率按上游原样透传，偶有错误——实测 FXAIX 报 0.42%，实际为 0.015%。
+- `fund_trailing_returns_percent` 沿用上游的混合口径:`ytd` 到 `one_year` 是区间收益,而 `three_year_annualized`、`five_year_annualized`、`ten_year_annualized` 是年化值。字段名直接标明口径 —— 五年期这两种口径能差出四倍。
 - `fund_top_holdings` 受上游限制最多 10 条，因此以 `fund_top_holdings_coverage_percent` 说明这些持仓合计占基金的比例。实测该比例从 VXUS 的 14% 到 XLE 的 73% 不等，无法据此计算两只基金之间的重叠度。债券、商品与反向基金完全不返回持仓，此时该字段直接缺失而非为空。
 
 ### `get_history`

@@ -61,6 +61,9 @@ describe('shapeFund', () => {
     expect(fund.fund_expense_ratio_percent).toBe(0.08)
     expect(fund.fund_expense_ratio_category_percent).toBe(0.9007)
     expect(fund.fund_trailing_returns_percent).toMatchObject({ ytd: 22.05, one_year: 34.25 })
+    // Upstream annualises past one year; the key says so because the two
+    // conventions differ by a factor of four over five years.
+    expect(fund.fund_trailing_returns_percent).toMatchObject({ five_year_annualized: 18.87, ten_year_annualized: 23.7 })
     expect(fund.fund_asset_allocation_percent).toMatchObject({ stock: 99.92, cash: 0.08 })
   })
 

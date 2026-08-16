@@ -119,6 +119,7 @@ Three things about the fund fields are stated in a `fund_notes` block in the res
 
 - `trailing_pe`, `price_to_book`, `book_value_per_share` and `eps_trailing_twelve_months` are holdings-weighted aggregates for a fund, not one company's figures. Left unlabelled, they get read as a valuation judgement on the fund.
 - The expense ratio is passed through as reported and is occasionally wrong — FXAIX was observed at 0.42% against a true 0.015%.
+- `fund_trailing_returns_percent` switches convention partway through, as upstream does: `ytd` through `one_year` are returns over that window, while `three_year_annualized`, `five_year_annualized` and `ten_year_annualized` are annualised. The keys say which, because the two differ by a factor of four over five years.
 - `fund_top_holdings` is capped at ten positions upstream, so `fund_top_holdings_coverage_percent` states how much of the fund they add up to. That share ranges from 14% (VXUS) to 73% (XLE) across the funds sampled, and fund-to-fund overlap cannot be computed from a partial list. Bond, commodity and inverse funds report no positions at all; the field is then absent rather than empty.
 
 ### `get_history`

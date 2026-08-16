@@ -130,15 +130,26 @@ function shapeAllocation(holdings: Record<string, unknown>): Record<string, unkn
   return Object.keys(allocation).length === 0 ? undefined : allocation
 }
 
+/**
+ * Upstream switches convention partway through this object: everything up to a
+ * year is the plain return over the window, while the multi-year figures are
+ * annualised. Verified against SPY — a reported `fiveYear` of 12.76% against an
+ * actual 83.95% cumulative, which annualises to 12.96%.
+ *
+ * The longer keys carry `_annualized` because a uniform `three_year` beside
+ * `one_year` reads as one convention throughout, and the two differ by a factor
+ * of four over five years. Naming it is the same fix `debt_to_equity_percent`
+ * applies to Yahoo's other silent convention.
+ */
 function shapeReturns(trailing: Record<string, unknown>): Record<string, unknown> | undefined {
   const returns = compact({
     ytd: percent(trailing.ytd, 2),
     one_month: percent(trailing.oneMonth, 2),
     three_month: percent(trailing.threeMonth, 2),
     one_year: percent(trailing.oneYear, 2),
-    three_year: percent(trailing.threeYear, 2),
-    five_year: percent(trailing.fiveYear, 2),
-    ten_year: percent(trailing.tenYear, 2),
+    three_year_annualized: percent(trailing.threeYear, 2),
+    five_year_annualized: percent(trailing.fiveYear, 2),
+    ten_year_annualized: percent(trailing.tenYear, 2),
   })
   return Object.keys(returns).length === 0 ? undefined : returns
 }
