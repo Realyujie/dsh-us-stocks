@@ -23,6 +23,7 @@ const AMZN = {
     netInfoShares: 456_643,
     totalInsiderShares: 956_638_144,
     netInstSharesBuying: -704_049_622,
+    netInstBuyingPercent: -0.09481,
   },
   institutionOwnership: {
     ownershipList: [
@@ -80,8 +81,11 @@ describe('get_ownership', () => {
       buy_count: 58,
       sell_count: 67,
       net_shares: 456_643,
-      net_institutional_shares: -704_049_622,
     })
+    // Institutions are a sibling, not a member of insider_activity: upstream
+    // reports both from one module, but the path has to say what it carries.
+    expect(result.data.insider_activity).not.toHaveProperty('net_institutional_shares')
+    expect(result.data.institutional_activity).toEqual({ net_shares: -704_049_622, net_percent: -9.48 })
     expect(result.data.ownership_note).toMatch(/net positive/i)
   })
 

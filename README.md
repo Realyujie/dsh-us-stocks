@@ -200,7 +200,7 @@ Headline metadata only. Article bodies are not fetched. Upstream returns at most
 | `detail` | enum | `summary` (default) or `full` |
 | `limit` | integer | Rows per list, 1-50. Default 10 |
 
-`summary` returns the insider/institutional breakdown, the largest institutional and fund holders, and insiders' aggregate buying and selling over six months. `full` additionally returns individual insider filings and the named insiders with their holdings; those filings are most of the payload, which is why they are opt-in.
+`summary` returns the insider/institutional breakdown, the largest institutional and fund holders, and insiders' aggregate buying and selling over six months. `insider_activity` and `institutional_activity` are siblings: upstream reports both from one module, but a path reading `insider_activity.net_institutional_shares` would say one thing and carry another. Only the insider figures carry a `period` — upstream never states the window its institutional net spans. `full` additionally returns individual insider filings and the named insiders with their holdings; those filings are most of the payload, which is why they are opt-in.
 
 Holder figures come from quarterly 13F filings and are as of each row's own `report_date`, not today. `insider_activity` aggregates every insider over the period, so it can be net positive while one well-publicised insider was selling — a distinction restated in `ownership_note`, because a model reconciling this against a news story needs to know the two are different measurements rather than a contradiction.
 

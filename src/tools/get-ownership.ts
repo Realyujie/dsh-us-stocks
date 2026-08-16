@@ -69,6 +69,7 @@ export async function getOwnership(
 
     const breakdown = shapeBreakdown(record(summary.majorHoldersBreakdown))
     const insiderActivity = shapeInsiderActivity(record(summary.netSharePurchaseActivity))
+    const institutionalActivity = shapeInstitutionalActivity(record(summary.netSharePurchaseActivity))
     const institutions = shapeHolders(record(summary.institutionOwnership).ownershipList, limit)
     const funds = shapeHolders(record(summary.fundOwnership).ownershipList, limit)
     const transactions = detail === 'full'
@@ -82,6 +83,7 @@ export async function getOwnership(
       detail,
       ownership_breakdown: breakdown,
       insider_activity: insiderActivity,
+      institutional_activity: institutionalActivity,
       top_institutional_holders: institutions,
       top_fund_holders: funds,
       insider_transactions: transactions,
@@ -154,8 +156,25 @@ function shapeInsiderActivity(raw: Record<string, unknown>): Record<string, unkn
     /** Positive when insiders bought more shares than they sold over the period. */
     net_shares: num(raw.netInfoShares),
     total_insider_shares: num(raw.totalInsiderShares),
-    /** Institutions rather than insiders; negative means they reduced overall. */
-    net_institutional_shares: num(raw.netInstSharesBuying),
+  })
+  return Object.keys(activity).length === 0 ? undefined : activity
+}
+
+/**
+ * Institutions, not insiders — reported by upstream inside the same module as
+ * the insider counts, which is where it lived here at first. A path reading
+ * `insider_activity.net_institutional_shares` says one thing and carries
+ * another, so the two are siblings instead.
+ *
+ * No `period`: the module's `6m` sits beside the insider counts, while
+ * institutional positions come from quarterly 13Fs. Upstream never says which
+ * window this figure spans, so neither does this.
+ */
+function shapeInstitutionalActivity(raw: Record<string, unknown>): Record<string, unknown> | undefined {
+  const activity = compact({
+    /** Negative when institutions reduced their holdings overall. */
+    net_shares: num(raw.netInstSharesBuying),
+    net_percent: percent(raw.netInstBuyingPercent),
   })
   return Object.keys(activity).length === 0 ? undefined : activity
 }

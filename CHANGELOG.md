@@ -56,6 +56,13 @@ All notable changes to this project are documented here. The format follows
   hold, and built "insiders are selling" out of one large filing while the
   six-month aggregate was net +456,643 shares.
 
+  `institutional_activity` is a sibling of `insider_activity` rather than a
+  member of it. Upstream returns both from one module, and following that
+  shape gave a path — `insider_activity.net_institutional_shares` — whose name
+  said insiders and whose value was institutions. Only the insider block
+  carries a `period`; upstream never states the window its institutional net
+  spans, so this does not either.
+
   `ownership_note` states that holder rows are as of their own `report_date`
   and that the six-month aggregate can be net positive while one insider was
   visibly selling — the reconciliation a model would otherwise have to guess
