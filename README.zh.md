@@ -11,7 +11,7 @@
 提供行情、历史 K 线、财务报表、分析师共识、新闻、股东结构六个专用工具，无需模型自行解析网页。
 
 <p align="center">
-  <img src="./assets/readme/overview.zh.svg" alt="六个工具覆盖行情、K 线、财报、分析师、新闻与股东。同一 AAPL 任务：未装载 31 次调用 / 213 秒，装载后 5 次 / 2.6 秒。" width="960">
+  <img src="./assets/readme/overview.zh.svg" alt="六个工具覆盖行情、K 线、财报、分析师、新闻与股东。同一 AAPL 任务：未装载 31 次调用 / 213 秒，装载后 6 次 / 3.1 秒。" width="960">
 </p>
 
 ## 效果对比
@@ -23,9 +23,9 @@
 | 步骤   | 14 步                          | 2 步     |
 | 工具调用 | 31 次                          | 5 次     |
 | 整体耗时 | 213.5 秒                       | 33.2 秒  |
-| 调用构成 | 16 次 `web_search`、15 次 `bash` | 五个工具各一次 |
+| 调用构成 | 16 次 `web_search`、15 次 `bash` | 任务需要的每个工具各一次 |
 
-在缺少行情数据工具的情况下，模型只能依靠网页搜索与 shell 命令，逐个页面抓取并解析。其余 33 秒主要为模型推理耗时，不在本插件的作用范围内；数据获取本身占 2.6 秒。
+在缺少行情数据工具的情况下，模型只能依靠网页搜索与 shell 命令，逐个页面抓取并解析。其余 33 秒主要为模型推理耗时，不在本插件的作用范围内；数据获取本身占 3.1 秒。
 
 <details>
 <summary>验收基准 — AAPL</summary>
@@ -33,15 +33,16 @@
 ```
 Acceptance benchmark — AAPL
 
-  ✅ get_quote           2092ms  305.26 USD (+0.9959%), mcap 4455.02B
-  ✅ get_history          437ms  63 bars 2026-05-14..2026-08-13
-  ✅ get_financials      2255ms  4 income / 4 balance / 4 cash-flow periods
-  ✅ get_analyst_view    2557ms  buy from 41 analysts, target 322.2844
-  ✅ get_news             974ms  8 headlines, latest "Tim Cook’s Final Act: A $60 Billion Bet On Texa…"
+  ✅ get_quote           2016ms  305.93 USD (+0.2195%), mcap 4464.80B
+  ✅ get_history          446ms  62 bars 2026-05-18..2026-08-14
+  ✅ get_financials      2181ms  4 income / 4 balance / 4 cash-flow periods
+  ✅ get_analyst_view    2492ms  buy from 41 analysts, target 322.2844
+  ✅ get_news             632ms  8 headlines, latest "Google is using a $29 gadget to tighten its gri…"
+  ✅ get_ownership       3135ms  66.48% institutional across 7709 filers, insiders net 35206 shares over 6m
 
-  tool calls        5
-  wall clock        2.56s (concurrent)
-  payload           22.0 KiB across 5 results
+  tool calls        6
+  wall clock        3.14s (concurrent)
+  payload           26.2 KiB across 6 results
 ```
 
 </details>
@@ -269,7 +270,7 @@ quoteTtlMs: 10000      # 实时行情缓存时长
 referenceTtlMs: 300000 # 报表、K 线、评级和新闻的缓存时长
 ```
 
-缓存为进程内内存缓存。并发的相同请求会合并为一次上游调用，因此模型对同一代码并发调用五个工具时，不会产生五次冗余请求。失败结果不进入缓存。
+缓存为进程内内存缓存。并发的相同请求会合并为一次上游调用，因此模型对同一代码并发调用六个工具时，不会产生六次冗余请求。失败结果不进入缓存。
 
 ## 开发
 

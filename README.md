@@ -11,7 +11,7 @@ US stock market data tools for [DeepSeek Harness](https://github.com/deepseek-ai
 Gives the agent six first-class tools for quotes, price history, financial statements, analyst consensus, news and ownership — instead of leaving it to improvise against HTML pages.
 
 <p align="center">
-  <img src="./assets/readme/overview.svg" alt="Six tools for one ticker: quote, history, financials, analyst view, news, ownership. Same AAPL task: 31 calls in 213s without the plugin, 5 calls in 2.6s with it." width="960">
+  <img src="./assets/readme/overview.svg" alt="Six tools for one ticker: quote, history, financials, analyst view, news, ownership. Same AAPL task: 31 calls in 213s without the plugin, 6 calls in 3.1s with it." width="960">
 </p>
 
 ## Before and after
@@ -23,9 +23,9 @@ One agent turn, same question, same model, same machine — the only variable is
 | Steps | 14 | 2 |
 | Tool calls | 31 | 5 |
 | Wall clock | 213.5s | 33.2s |
-| What it called | 16 × `web_search`, 15 × `bash` | one call to each of the five tools |
+| What it called | 16 × `web_search`, 15 × `bash` | one call to each tool the task needed |
 
-With no market-data tool available, the agent falls back on web search and shell commands, fetching and parsing one page at a time. Most of the remaining 33 seconds is model inference, which no plugin controls; data retrieval itself is 2.6s.
+With no market-data tool available, the agent falls back on web search and shell commands, fetching and parsing one page at a time. Most of the remaining 33 seconds is model inference, which no plugin controls; data retrieval itself is 3.1s.
 
 <details>
 <summary>Acceptance benchmark — AAPL</summary>
@@ -33,15 +33,16 @@ With no market-data tool available, the agent falls back on web search and shell
 ```
 Acceptance benchmark — AAPL
 
-  ✅ get_quote           2092ms  305.26 USD (+0.9959%), mcap 4455.02B
-  ✅ get_history          437ms  63 bars 2026-05-14..2026-08-13
-  ✅ get_financials      2255ms  4 income / 4 balance / 4 cash-flow periods
-  ✅ get_analyst_view    2557ms  buy from 41 analysts, target 322.2844
-  ✅ get_news             974ms  8 headlines, latest "Tim Cook’s Final Act: A $60 Billion Bet On Texa…"
+  ✅ get_quote           2016ms  305.93 USD (+0.2195%), mcap 4464.80B
+  ✅ get_history          446ms  62 bars 2026-05-18..2026-08-14
+  ✅ get_financials      2181ms  4 income / 4 balance / 4 cash-flow periods
+  ✅ get_analyst_view    2492ms  buy from 41 analysts, target 322.2844
+  ✅ get_news             632ms  8 headlines, latest "Google is using a $29 gadget to tighten its gri…"
+  ✅ get_ownership       3135ms  66.48% institutional across 7709 filers, insiders net 35206 shares over 6m
 
-  tool calls        5
-  wall clock        2.56s (concurrent)
-  payload           22.0 KiB across 5 results
+  tool calls        6
+  wall clock        3.14s (concurrent)
+  payload           26.2 KiB across 6 results
 ```
 
 </details>
@@ -269,7 +270,7 @@ quoteTtlMs: 10000      # live quote cache lifetime
 referenceTtlMs: 300000 # statements, bars, ratings and news cache lifetime
 ```
 
-Caching is in-memory and per-process. Concurrent identical requests are collapsed onto a single upstream call, so an agent fanning five tools at one ticker does not make five redundant round trips. Failures are never cached.
+Caching is in-memory and per-process. Concurrent identical requests are collapsed onto a single upstream call, so an agent fanning six tools at one ticker does not make six redundant round trips. Failures are never cached.
 
 ## Development
 

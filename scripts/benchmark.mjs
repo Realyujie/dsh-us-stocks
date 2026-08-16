@@ -1,5 +1,5 @@
 /**
- * Acceptance benchmark: the five questions a ticker research task needs.
+ * Acceptance benchmark: the six questions a ticker research task needs.
  *
  * Reproduces the data an agent gathered by hand in the original session log
  * (price, financials, ratings, news) and measures how long the plugin needs.
@@ -17,13 +17,14 @@ const ticker = process.argv[2] ?? 'AAPL'
 const client = new YahooClient()
 const tools = new Map(createUsStockTools('us', client).map((tool) => [tool.name, tool]))
 
-// The same five questions the original session answered by scraping.
+// The same questions the original session answered by scraping.
 const plan = [
   ['get_quote', { ticker }],
   ['get_history', { ticker, range: '3mo', interval: '1d' }],
   ['get_financials', { ticker, period: 'quarterly', limit: 4 }],
   ['get_analyst_view', { ticker }],
   ['get_news', { ticker, limit: 8 }],
+  ['get_ownership', { ticker }],
 ]
 
 console.log(`Acceptance benchmark — ${ticker}\n`)
@@ -72,6 +73,10 @@ function summarize(name, data) {
       return `${data.consensus.recommendation_key} from ${data.consensus.analyst_count} analysts, target ${data.consensus.target_mean_price}`
     case 'get_news':
       return `${data.article_count} headlines, latest "${truncate(data.articles[0]?.title)}"`
+    case 'get_ownership':
+      return `${data.ownership_breakdown?.institutions_percent}% institutional across `
+        + `${data.ownership_breakdown?.institutions_count} filers, insiders net `
+        + `${data.insider_activity?.net_shares} shares over ${data.insider_activity?.period}`
     default:
       return ''
   }

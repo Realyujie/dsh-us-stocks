@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" role="img" aria-labelledby="title desc">
   <title id="title">dsh-us-stocks: six tools for one ticker</title>
-  <desc id="desc">AAPL quote, history, financials, analyst view, news, and ownership. Without the plugin: 31 calls in 213 seconds. With it: 5 calls in 2.6 seconds.</desc>
+  <desc id="desc">AAPL quote, history, financials, analyst view, news, and ownership. Without the plugin: 31 calls in 213 seconds. With it: 6 calls in 3.1 seconds.</desc>
 
   <rect width="960" height="560" fill="#000"/>
 
@@ -97,6 +97,6 @@
     <line x1="464" y1="498" x2="496" y2="498" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>
     <polyline points="488,492 496,498 488,504" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
     <text x="710" y="478" text-anchor="middle" fill="#3d7a52" font-size="11">with plugin</text>
-    <text x="710" y="504" text-anchor="middle" fill="#5FB478" font-size="18">5 calls &#183; 2.6s</text>
+    <text x="710" y="504" text-anchor="middle" fill="#5FB478" font-size="18">6 calls &#183; 3.1s</text>
   </g>
 </svg>
