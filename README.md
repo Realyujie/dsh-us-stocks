@@ -95,7 +95,7 @@ The plugin registers server-side agent tools. It also ships a small browser half
 
 | Tool | Returns |
 |---|---|
-| `get_quote` | Last price, change, day range, volume, market cap, P/E, EPS, book value, dividend yield, 52-week range, moving averages, last and next earnings dates |
+| `get_quote` | Last price, change, day range, volume, market cap, P/E, EPS, book value, dividend yield, 52-week range, moving averages, last and next earnings dates. For an ETF or mutual fund, also expense ratio, net assets, category, allocation, trailing returns and top holdings |
 | `get_history` | Daily/weekly/monthly OHLCV bars with adjusted close, plus dividends and splits in the window, as structured data points |
 | `get_financials` | Income statement, balance sheet and cash flow line items, quarterly or annual, with the reporting currency and trailing-twelve-month ratios |
 | `get_analyst_view` | Consensus rating, buy/hold/sell counts by month, price targets, forward EPS and revenue estimates, recent broker upgrades and downgrades, EPS beat/miss history |
@@ -112,6 +112,14 @@ Earnings dates are reported as `last_earnings_date` and `next_earnings_date` sep
 `currency` is what the stock trades in; `financial_currency` is what the company reports in. They differ for ADRs, and only the latter applies to the figures in `get_financials`.
 
 Analyst ratings are deliberately not part of this tool even though upstream returns one. Consensus ratings and price targets live in `get_analyst_view`, so a caller that only wants market data never has a recommendation put in front of it.
+
+**ETFs and mutual funds** additionally return `fund_expense_ratio_percent` (with the category average beside it), `fund_total_assets`, `fund_category`, `fund_family`, `fund_asset_allocation_percent`, `fund_trailing_returns_percent` and `fund_top_holdings`. Those come from a second upstream call made only when the quote says the symbol is a fund, so an equity pays nothing for them; a fund quote costs roughly three times an equity one. If that call fails the quote is still returned, with a warning.
+
+Three things about the fund fields are stated in a `fund_notes` block in the response itself, rather than only here, because whatever reads the numbers is reading the response:
+
+- `trailing_pe`, `price_to_book`, `book_value_per_share` and `eps_trailing_twelve_months` are holdings-weighted aggregates for a fund, not one company's figures. Left unlabelled, they get read as a valuation judgement on the fund.
+- The expense ratio is passed through as reported and is occasionally wrong — FXAIX was observed at 0.42% against a true 0.015%.
+- `fund_top_holdings` is capped at ten positions upstream, so `fund_top_holdings_coverage_percent` states how much of the fund they add up to. That share ranges from 14% (VXUS) to 73% (XLE) across the funds sampled, and fund-to-fund overlap cannot be computed from a partial list. Bond, commodity and inverse funds report no positions at all; the field is then absent rather than empty.
 
 ### `get_history`
 
@@ -168,6 +176,8 @@ Period codes count away from now in opposite directions: `recommendation_trend` 
 `rating_changes` keeps the ten most recent broker actions, newest first; upstream holds hundreds. `action` is `up`, `down`, `main` (reiterated) or `init` (coverage initiated).
 
 Prices here are in the trading currency (USD for US listings) even when the company reports in another — unlike the statement figures in `get_financials`.
+
+ETFs and funds return `no_data`: analysts rate individual companies, so a fund never carries a rating, a price target or an EPS estimate. Fund detail belongs to `get_quote`.
 
 ### `get_news`
 

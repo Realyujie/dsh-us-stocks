@@ -151,6 +151,87 @@ describe('get_quote', () => {
     const result = await getQuote('us', client, 'AAPL')
     expect(result).toMatchObject({ ok: false, error: { kind: 'upstream_unavailable', retryable: true } })
   })
+
+  it('adds fund detail for an ETF, opting out of the schema fundProfile fails', async () => {
+    const calls: { modules: readonly string[], options: unknown }[] = []
+    const client = fakeClient({
+      quote: async () => ({ symbol: 'XLK', quoteType: 'ETF', regularMarketPrice: 190.01 }),
+      quoteSummary: async (_t: string, modules: readonly string[], _s: unknown, options: unknown) => {
+        calls.push({ modules, options })
+        return {
+          fundProfile: { feesExpensesInvestment: { annualReportExpenseRatio: 0.0008 } },
+          defaultKeyStatistics: { totalAssets: 115_400_000_000, fundFamily: 'State Street' },
+        }
+      },
+    })
+
+    const result = await getQuote('us', client, 'XLK')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.data.price).toBe(190.01)
+    expect(result.data.fund_expense_ratio_percent).toBe(0.08)
+    expect(result.data.fund_family).toBe('State Street')
+    expect(calls).toHaveLength(1)
+    expect(calls[0].options).toMatchObject({ validateResult: false })
+  })
+
+  it('adds fund detail for a mutual fund too', async () => {
+    const client = fakeClient({
+      quote: async () => ({ symbol: 'VFIAX', quoteType: 'MUTUALFUND' }),
+      quoteSummary: async () => ({ defaultKeyStatistics: { category: 'Large Blend' } }),
+    })
+
+    const result = await getQuote('us', client, 'VFIAX')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.data.fund_category).toBe('Large Blend')
+  })
+
+  // The second call is what makes a fund quote cost roughly three times an
+  // equity one, so an equity must never reach it.
+  it('never makes the fund call for an equity', async () => {
+    let summaries = 0
+    const client = fakeClient({
+      quote: async () => ({ symbol: 'AAPL', quoteType: 'EQUITY' }),
+      quoteSummary: async () => { summaries += 1; return {} },
+    })
+
+    const result = await getQuote('us', client, 'AAPL')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(summaries).toBe(0)
+    expect(JSON.stringify(result.data)).not.toMatch(/fund_/)
+  })
+
+  // The price is already in hand at that point; failing the whole call would
+  // throw away an answer the caller can still use.
+  it('degrades to a warning when the fund call fails, keeping the quote', async () => {
+    const client = fakeClient({
+      quote: async () => ({ symbol: 'SPY', quoteType: 'ETF', regularMarketPrice: 690.5 }),
+      quoteSummary: async () => { throw new Error('fetch failed') },
+    })
+
+    const result = await getQuote('us', client, 'SPY')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.data.price).toBe(690.5)
+    expect(result.data).not.toHaveProperty('fund_expense_ratio_percent')
+    expect(result.warnings?.[0]).toMatch(/fund detail.*unavailable/i)
+  })
+
+  it('keeps the plain quote when a fund reports no profile at all', async () => {
+    const client = fakeClient({
+      quote: async () => ({ symbol: 'NEWETF', quoteType: 'ETF', regularMarketPrice: 25 }),
+      quoteSummary: async () => ({}),
+    })
+
+    const result = await getQuote('us', client, 'NEWETF')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.data.price).toBe(25)
+    expect(JSON.stringify(result.data)).not.toMatch(/fund_/)
+    expect(result.warnings).toBeUndefined()
+  })
 })
 
 describe('get_history', () => {
@@ -625,6 +706,29 @@ describe('get_analyst_view', () => {
       surprise_percent: 0.0452,
       currency: 'USD',
     }])
+  })
+
+  // Upstream says "No fundamentals data found for symbol: XLK", which reads as
+  // a fault rather than the permanent fact that nothing sell-side covers a fund.
+  it('explains why a fund has no coverage instead of relaying the upstream wording', async () => {
+    const client = fakeClient({
+      quoteSummary: async () => { throw new Error('No fundamentals data found for symbol: XLK') },
+    })
+
+    const result = await getAnalystView('us', client, 'XLK')
+    expect(result).toMatchObject({ ok: false, error: { kind: 'no_data', retryable: false } })
+    if (result.ok) return
+    expect(result.error.message).toMatch(/analysts rate individual companies/i)
+    expect(result.error.message).not.toMatch(/no fundamentals data found/i)
+  })
+
+  it('leaves an unrelated failure classified as it was', async () => {
+    const client = fakeClient({
+      quoteSummary: async () => { throw new Error('fetch failed') },
+    })
+
+    const result = await getAnalystView('us', client, 'AAPL')
+    expect(result).toMatchObject({ ok: false, error: { kind: 'upstream_unavailable', retryable: true } })
   })
 })
 

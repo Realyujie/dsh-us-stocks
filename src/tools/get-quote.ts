@@ -2,6 +2,7 @@ import { defineTool, type ToolDefinition } from '@deepseek-ai/dsh-tools'
 import type { YahooClient } from '../datasource/us/yahoo-client.ts'
 import { guard, success, type ToolEnvelope } from '../util/errors.ts'
 import { stringify } from '../util/stringify.ts'
+import { fetchFundDetail, isFundQuoteType } from './fund.ts'
 import { compact, isoDate, jsonOutput, num, round, str, tickerSchema, TOOL_TIMEOUT_MS } from './shared.ts'
 
 export function createGetQuoteTool(market: string, client: YahooClient): ToolDefinition {
@@ -12,9 +13,13 @@ export function createGetQuoteTool(market: string, client: YahooClient): ToolDef
       + 'dividend yield, 52-week range and moving averages. '
       + 'Reports the last and next earnings dates separately; when `next_earnings_date_is_estimate` is true '
       + 'that date is projected from the reporting cadence, not confirmed by the company. '
+      + 'Also covers ETFs and mutual funds: those additionally return expense ratio, net assets, category, '
+      + 'issuer, asset allocation, trailing returns and top holdings, so answering "what is this fund" needs '
+      + 'no separate lookup. Read `fund_notes` before quoting those figures — the equity ratios are '
+      + 'holdings-weighted aggregates there, and the holdings list is a partial one. '
       + 'One symbol per call. Use exchange tickers such as AAPL or BRK-B.',
     parameters: {
-      ticker: tickerSchema('Stock symbol, e.g. "AAPL".'),
+      ticker: tickerSchema('Stock symbol, e.g. "AAPL". ETF and mutual-fund symbols are accepted.'),
     },
     output: jsonOutput(),
     timeoutMs: TOOL_TIMEOUT_MS,
@@ -31,8 +36,33 @@ export async function getQuote(
 ): Promise<ToolEnvelope<Record<string, unknown>>> {
   return await guard(market, ticker, async () => {
     const q = await client.quote(ticker, signal)
-    return success(market, shapeQuote(q), { ticker: str(q.symbol) ?? ticker })
+    const quote = shapeQuote(q)
+    const resolved = str(q.symbol) ?? ticker
+
+    // Sequential, not parallel: the fund modules are worth fetching only once
+    // the quote says this is a fund, and nothing else reveals that. Equities
+    // therefore pay nothing for this — they never make the second call.
+    if (!isFundQuoteType(quote.quote_type)) {
+      return success(market, quote, { ticker: resolved })
+    }
+
+    try {
+      const fund = await fetchFundDetail(client, resolved, signal)
+      return success(market, fund === undefined ? quote : { ...quote, ...fund }, { ticker: resolved })
+    } catch (error) {
+      // The quote itself succeeded. Losing the fund detail is a degraded
+      // answer, not a failed one, so it is reported as a warning rather than
+      // discarding a price the caller can still use.
+      return success(market, quote, {
+        ticker: resolved,
+        warnings: [`Fund detail (expense ratio, holdings, returns) was unavailable: ${describe(error)}`],
+      })
+    }
   })
+}
+
+function describe(error: unknown): string {
+  return error instanceof Error ? error.message : String(error)
 }
 
 function shapeQuote(q: Record<string, unknown>): Record<string, unknown> {

@@ -100,7 +100,7 @@ dsh plugin --profile web add link:/absolute/path/to/dsh-us-stocks
 
 | 工具                 | 返回内容                                                     |
 | ------------------ | -------------------------------------------------------- |
-| `get_quote`        | 最新价、涨跌、日内区间、成交量、市值、市盈率、每股收益、每股净资产、股息率、52 周区间、均线、上次和下次财报日 |
+| `get_quote`        | 最新价、涨跌、日内区间、成交量、市值、市盈率、每股收益、每股净资产、股息率、52 周区间、均线、上次和下次财报日。ETF 与共同基金另有费率、规模、分类、资产配置、滚动收益与前十大持仓 |
 | `get_history`      | 日/周/月 K 线 OHLCV 及复权收盘价，附窗口内的分红与拆股，纯结构化数据                 |
 | `get_financials`   | 利润表、资产负债表、现金流量表科目，季度或年度，含报表货币与 TTM 比率                    |
 | `get_analyst_view` | 共识评级、逐月买入/持有/卖出家数、目标价、EPS 与营收预期、近期券商评级变动、EPS 超预期记录       |
@@ -122,6 +122,14 @@ dsh plugin --profile web add link:/absolute/path/to/dsh-us-stocks
 `currency` 是股票的交易货币，`financial_currency` 是公司的报表货币。ADR 的这两者不一致，而 `get_financials` 中的数字仅以后者计价。
 
 上游虽然返回了分析师评级，本工具有意不包含该字段。共识评级与目标价统一由 `get_analyst_view` 提供，使仅需行情数据的调用方不会一并收到投资建议。
+
+**ETF 与共同基金**会额外返回 `fund_expense_ratio_percent`（并附同类均值）、`fund_total_assets`、`fund_category`、`fund_family`、`fund_asset_allocation_percent`、`fund_trailing_returns_percent` 和 `fund_top_holdings`。这些来自第二次上游请求，仅在行情确认该标的为基金后才发出，个股不承担任何额外开销；基金的一次查询耗时约为个股的三倍。该请求失败时仍返回行情本体，并附一条 warning。
+
+关于基金字段有三点写在响应内的 `fund_notes` 里，而不只写在这里——因为读这些数字的对象读的是响应：
+
+- 对基金而言，`trailing_pe`、`price_to_book`、`book_value_per_share`、`eps_trailing_twelve_months` 是成分股的加权聚合值，不是某一家公司的数据。不加标注时会被当成对该基金的估值判断。
+- 费率按上游原样透传，偶有错误——实测 FXAIX 报 0.42%，实际为 0.015%。
+- `fund_top_holdings` 受上游限制最多 10 条，因此以 `fund_top_holdings_coverage_percent` 说明这些持仓合计占基金的比例。实测该比例从 VXUS 的 14% 到 XLE 的 73% 不等，无法据此计算两只基金之间的重叠度。债券、商品与反向基金完全不返回持仓，此时该字段直接缺失而非为空。
 
 ### `get_history`
 
@@ -184,6 +192,8 @@ K 线是按输出预算实测裁剪的，而不是按固定根数——单根成
 `rating_changes` 保留最近 10 条券商评级动作，最新在前；上游共存有数百条。`action` 取值为 `up`、`down`、`main`（维持）或 `init`（首次覆盖）。
 
 本工具中的价格以交易货币计价（美股即美元），即使公司以其他货币编制报表亦然——这一点与 `get_financials` 的报表数字不同。
+
+ETF 与基金返回 `no_data`：分析师覆盖的是具体公司，基金不会有评级、目标价或 EPS 预期。基金数据请用 `get_quote`。
 
 ### `get_news`
 

@@ -6,6 +6,43 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `get_quote` returns fund detail for ETFs and mutual funds: expense ratio
+  against its category average, net assets, category, issuer, asset
+  allocation, trailing returns, and top holdings with the share of the fund
+  they cover. Observed without it: asked to look at XLK, the agent called this
+  plugin, found no expense ratio or holdings, and fell back to `web_search`
+  for exactly those two — which returned link titles and no content, spending
+  9.4s of a 27s answer and an extra step to learn nothing. The expense ratio
+  then went unmentioned, and the holdings were recited from memory in the
+  wrong order.
+
+  The extra call fires only once the quote reports a fund, so equities are
+  unaffected; a fund quote costs roughly three times an equity one. If it
+  fails the quote is still returned, with a warning, since the price is
+  already in hand.
+
+  Mutual funds are covered alongside ETFs. They report the same modules, and
+  gating on `ETF` alone would have dropped every `VFIAX`-shaped symbol.
+
+- `fund_notes` in fund responses, carrying three caveats where the numbers are
+  read rather than only in the docs: that `trailing_pe` and its neighbours are
+  holdings-weighted aggregates for a fund (a model was seen calling an ETF's
+  P/E an expensive valuation, with nothing to suggest otherwise); that the
+  expense ratio is upstream's and can be wrong (FXAIX reported 0.42% against a
+  true 0.015%); and that the holdings list is capped at ten, so fund overlap
+  cannot be derived from it. Each note appears only when the field it
+  qualifies does — commodity and bond funds report no holdings at all.
+
+### Fixed
+
+- `get_analyst_view` relayed upstream's "No fundamentals data found for
+  symbol: XLK" for funds, which reads as a fault rather than as permanent.
+  It now explains that analysts rate companies and funds therefore carry no
+  ratings, targets or estimates, matching how `get_financials` already answers
+  the same question about statements.
+
 ## [0.2.0] - 2026-08-15
 
 ### Added

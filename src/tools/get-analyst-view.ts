@@ -1,6 +1,6 @@
 import { defineTool, type ToolDefinition } from '@deepseek-ai/dsh-tools'
 import type { YahooClient } from '../datasource/us/yahoo-client.ts'
-import { DataSourceError, guard, success, type ToolEnvelope } from '../util/errors.ts'
+import { classify, DataSourceError, guard, success, type ToolEnvelope } from '../util/errors.ts'
 import { stringify } from '../util/stringify.ts'
 import { compact, isoDate, jsonOutput, num, round, str, tickerSchema, TOOL_TIMEOUT_MS } from './shared.ts'
 
@@ -52,7 +52,7 @@ export async function getAnalystView(
 ): Promise<ToolEnvelope<Record<string, unknown>>> {
   return await guard(market, ticker, async () => {
     const [summary, ratingChanges] = await Promise.all([
-      client.quoteSummary(ticker, MODULES, signal),
+      fetchConsensus(client, ticker, signal),
       resolveRatingChanges(client, ticker, signal),
     ])
 
@@ -98,6 +98,32 @@ export async function getAnalystView(
 }
 
 /** Best-effort: losing the rating history must not cost the consensus too. */
+/**
+ * Upstream answers a fund with "No fundamentals data found for symbol: XLK",
+ * which classifies correctly as `no_data` but reads as a fault rather than as
+ * the permanent fact it is. Nothing sell-side covers an ETF or an index fund:
+ * analysts rate companies, and a fund holds them. Saying so stops the model
+ * treating the gap as something worth working around — the shape of message
+ * `get_financials` already uses for the same question about statements.
+ */
+async function fetchConsensus(
+  client: YahooClient,
+  ticker: string,
+  signal?: AbortSignal,
+): Promise<Record<string, unknown>> {
+  try {
+    return await client.quoteSummary(ticker, MODULES, signal)
+  } catch (error) {
+    if (classify(error).kind !== 'no_data') throw error
+    throw new DataSourceError(
+      'no_data',
+      `No sell-side coverage for "${ticker}". Analysts rate individual companies, so ETFs, mutual funds and `
+      + 'index products never carry ratings, price targets or EPS estimates.',
+      { cause: error },
+    )
+  }
+}
+
 async function resolveRatingChanges(
   client: YahooClient,
   ticker: string,
