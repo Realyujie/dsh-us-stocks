@@ -14,10 +14,6 @@ Gives the agent six first-class tools for quotes, price history, financial state
   <img src="./assets/readme/overview.svg" alt="Six tools for one ticker: quote, history, financials, analyst view, news, ownership. Same AAPL task: 31 calls in 213s without the plugin, 5 calls in 2.6s with it." width="960">
 </p>
 
-<p align="center">
-  <img src="./assets/readme/hero.png" alt="dsh-us-stocks rendering an AAPL candlestick chart in DeepSeek Harness" width="1200">
-</p>
-
 ## Before and after
 
 One agent turn, same question, same model, same machine — the only variable is whether the plugin is installed. The task: *price, three-month trend, recent quarterly financials, analyst rating and recent news for AAPL.*
@@ -29,9 +25,10 @@ One agent turn, same question, same model, same machine — the only variable is
 | Wall clock | 213.5s | 33.2s |
 | What it called | 16 × `web_search`, 15 × `bash` | one call to each of the five tools |
 
-With no market-data tool available, the agent falls back on web search and shell commands, fetching and parsing one page at a time.
+With no market-data tool available, the agent falls back on web search and shell commands, fetching and parsing one page at a time. Most of the remaining 33 seconds is model inference, which no plugin controls; data retrieval itself is 2.6s.
 
-Most of the remaining 33 seconds is model inference, which no plugin controls. Data retrieval itself is 2.6s:
+<details>
+<summary>Acceptance benchmark — AAPL</summary>
 
 ```
 Acceptance benchmark — AAPL
@@ -46,6 +43,8 @@ Acceptance benchmark — AAPL
   wall clock        2.56s (concurrent)
   payload           22.0 KiB across 5 results
 ```
+
+</details>
 
 Reproduce with `npm run benchmark`, optionally against another ticker: `npm run benchmark -- TTMI`.
 
@@ -142,6 +141,10 @@ Bars are ordered oldest to newest. `date` is `yyyy-MM-dd` for `1d`/`1wk`/`1mo`, 
 `interval: "1h"` is separately capped by the upstream source at about 730 days of history, regardless of the requested window. A `range` or `start_date` older than that fails with `invalid_argument` rather than the truncation warning the other intervals get, since Yahoo refuses the request outright instead of returning a partial one.
 
 In the Web UI the call renders as a candlestick chart — bodies, wicks, a volume band, price gridlines and per-bar OHLC on hover — drawn from the same payload the model receives, so the picture and the numbers cannot disagree. Colours follow the host theme, green rising and red falling. Chart labels follow the host language, English or Chinese; messages from the data source are shown verbatim, since they are written for the model as well as the reader. Elsewhere the call shows the host's generic result card; the tool's output is identical either way.
+
+<p align="center">
+  <img src="./assets/readme/hero.png" alt="dsh-us-stocks rendering an AAPL candlestick chart in DeepSeek Harness" width="1200">
+</p>
 
 Every response carries a `chart_note` explaining this, because the model reads the returned data when deciding what to do next, not the tool description it read at call time. Without it, a model that got a chart in the Web UI has been observed spending a minute installing `matplotlib` into a virtualenv to build a second one, unaware the request was already satisfied.
 
