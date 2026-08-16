@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" role="img" aria-labelledby="title desc">
+  <title id="title">dsh-us-stocks: six tools for one ticker</title>
+  <desc id="desc">AAPL quote, history, financials, analyst view, news, and ownership. Without the plugin: 31 calls in 213 seconds. With it: 5 calls in 2.6 seconds.</desc>
+
+  <rect width="960" height="560" fill="#000"/>
+
+  <g font-family="Menlo, Monaco, Consolas, 'Courier New', monospace">
+
+    <rect x="40" y="28" width="880" height="56" rx="10" fill="#0a0a0a" stroke="#222"/>
+    <rect x="56" y="40" width="62" height="32" rx="6" fill="#0c1810" stroke="#1e4a32"/>
+    <text x="87" y="61" text-anchor="middle" fill="#5FB478" font-size="14">AAPL</text>
+    <text x="134" y="61" fill="#8a8a8a" font-size="14">price &#183; trend &#183; financials &#183; rating &#183; news &#183; holders</text>
+
+    <g>
+      <rect x="40" y="104" width="280" height="156" rx="10" fill="#0a0a0a" stroke="#222"/>
+      <g transform="translate(60,121)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="1,16 5.5,11.5 9,13 14,6 20,3.2" stroke="#5FB478" stroke-width="1.75"/>
+        <circle cx="20" cy="3.2" r="1.8" fill="#5FB478" stroke="none"/>
+      </g>
+      <text x="92" y="137" fill="#737373" font-size="13">get_quote</text>
+      <text x="60" y="186" fill="#f2f2f2" font-size="26">305.26</text>
+      <text x="60" y="212" font-size="13">
+        <tspan fill="#8a8a8a">USD  </tspan>
+        <tspan fill="#5FB478">+1.0%</tspan>
+      </text>
+    </g>
+
+    <g>
+      <rect x="340" y="104" width="280" height="156" rx="10" fill="#0a0a0a" stroke="#222"/>
+      <g transform="translate(360,121)" stroke-linecap="round">
+        <line x1="2.5" y1="3" x2="2.5" y2="18" stroke="#5FB478" stroke-width="1.2"/>
+        <rect x="1.1" y="7.5" width="2.8" height="6.5" fill="#5FB478"/>
+        <line x1="7.5" y1="5.5" x2="7.5" y2="17" stroke="#FC6C54" stroke-width="1.2"/>
+        <rect x="6.1" y="7" width="2.8" height="5.5" fill="#FC6C54"/>
+        <line x1="12.5" y1="2" x2="12.5" y2="16" stroke="#5FB478" stroke-width="1.2"/>
+        <rect x="11.1" y="5.5" width="2.8" height="7.5" fill="#5FB478"/>
+        <line x1="17.5" y1="6.5" x2="17.5" y2="19" stroke="#FC6C54" stroke-width="1.2"/>
+        <rect x="16.1" y="9.5" width="2.8" height="5.5" fill="#FC6C54"/>
+      </g>
+      <text x="392" y="137" fill="#737373" font-size="13">get_history</text>
+      <text x="360" y="186" fill="#f2f2f2" font-size="26">63 bars</text>
+      <text x="360" y="212" fill="#8a8a8a" font-size="13">3 months &#183; 1d</text>
+    </g>
+
+    <g>
+      <rect x="640" y="104" width="280" height="156" rx="10" fill="#0a0a0a" stroke="#222"/>
+      <g transform="translate(660,121)">
+        <rect x="1.5" y="10" width="3.4" height="9" rx="0.6" fill="#8a8a8a"/>
+        <rect x="7.2" y="4" width="3.4" height="15" rx="0.6" fill="#8a8a8a"/>
+        <rect x="12.9" y="7.5" width="3.4" height="11.5" rx="0.6" fill="#8a8a8a"/>
+      </g>
+      <text x="692" y="137" fill="#737373" font-size="13">get_financials</text>
+      <text x="660" y="186" fill="#f2f2f2" font-size="26">4Q</text>
+      <text x="660" y="212" fill="#8a8a8a" font-size="13">income &#183; balance &#183; cash</text>
+    </g>
+
+    <g>
+      <rect x="40" y="276" width="280" height="156" rx="10" fill="#0a0a0a" stroke="#222"/>
+      <g transform="translate(60,293)" fill="none">
+        <circle cx="10.5" cy="10.5" r="8.2" stroke="#8a8a8a" stroke-width="1.5"/>
+        <circle cx="10.5" cy="10.5" r="4.6" stroke="#8a8a8a" stroke-width="1.5"/>
+        <circle cx="10.5" cy="10.5" r="1.7" fill="#5FB478" stroke="none"/>
+      </g>
+      <text x="92" y="309" fill="#737373" font-size="13">get_analyst_view</text>
+      <text x="60" y="358" fill="#5FB478" font-size="26">Buy</text>
+      <text x="60" y="384" fill="#8a8a8a" font-size="13">41 analysts &#183; tgt 322</text>
+    </g>
+
+    <g>
+      <rect x="340" y="276" width="280" height="156" rx="10" fill="#0a0a0a" stroke="#222"/>
+      <g transform="translate(360,293)" fill="none" stroke-linecap="round">
+        <rect x="2.8" y="2.2" width="14.4" height="16.4" rx="2" stroke="#8a8a8a" stroke-width="1.5"/>
+        <line x1="6" y1="7" x2="14" y2="7" stroke="#8a8a8a" stroke-width="1.5"/>
+        <line x1="6" y1="10.6" x2="14" y2="10.6" stroke="#8a8a8a" stroke-width="1.5"/>
+        <line x1="6" y1="14.2" x2="11.2" y2="14.2" stroke="#8a8a8a" stroke-width="1.5"/>
+      </g>
+      <text x="392" y="309" fill="#737373" font-size="13">get_news</text>
+      <text x="360" y="358" fill="#f2f2f2" font-size="26">8</text>
+      <text x="360" y="384" fill="#8a8a8a" font-size="13">headlines</text>
+    </g>
+
+    <g>
+      <rect x="640" y="276" width="280" height="156" rx="10" fill="#0a0a0a" stroke="#222"/>
+      <g transform="translate(660,293)" fill="none">
+        <circle cx="10.5" cy="10.5" r="7.2" stroke="#2a2a2a" stroke-width="3.2"/>
+        <circle cx="10.5" cy="10.5" r="7.2" stroke="#5FB478" stroke-width="3.2" stroke-dasharray="32 13.2" transform="rotate(-90 10.5 10.5)"/>
+      </g>
+      <text x="692" y="309" fill="#737373" font-size="13">get_ownership</text>
+      <text x="660" y="358" fill="#f2f2f2" font-size="26">insiders</text>
+      <text x="660" y="384" fill="#8a8a8a" font-size="13">institutions &#183; funds</text>
+    </g>
+
+    <rect x="40" y="452" width="880" height="72" rx="10" fill="#0a0a0a" stroke="#222"/>
+    <text x="250" y="478" text-anchor="middle" fill="#555" font-size="11">without plugin</text>
+    <text x="250" y="504" text-anchor="middle" fill="#8a8a8a" font-size="18">31 calls &#183; 213s</text>
+    <line x1="464" y1="498" x2="496" y2="498" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>
+    <polyline points="488,492 496,498 488,504" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="710" y="478" text-anchor="middle" fill="#3d7a52" font-size="11">with plugin</text>
+    <text x="710" y="504" text-anchor="middle" fill="#5FB478" font-size="18">5 calls &#183; 2.6s</text>
+  </g>
+</svg>

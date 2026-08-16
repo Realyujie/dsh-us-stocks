@@ -11,6 +11,10 @@
 提供行情、历史 K 线、财务报表、分析师共识、新闻、股东结构六个专用工具，无需模型自行解析网页。
 
 <p align="center">
+  <img src="./assets/readme/overview.zh.svg" alt="六个工具覆盖行情、K 线、财报、分析师、新闻与股东。同一 AAPL 任务：未装载 31 次调用 / 213 秒，装载后 5 次 / 2.6 秒。" width="960">
+</p>
+
+<p align="center">
   <img src="./assets/readme/hero.png" alt="dsh-us-stocks 在 DeepSeek Harness 中渲染 AAPL K 线图" width="1200">
 </p>
 

@@ -11,6 +11,10 @@ US stock market data tools for [DeepSeek Harness](https://github.com/deepseek-ai
 Gives the agent six first-class tools for quotes, price history, financial statements, analyst consensus, news and ownership — instead of leaving it to improvise against HTML pages.
 
 <p align="center">
+  <img src="./assets/readme/overview.svg" alt="Six tools for one ticker: quote, history, financials, analyst view, news, ownership. Same AAPL task: 31 calls in 213s without the plugin, 5 calls in 2.6s with it." width="960">
+</p>
+
+<p align="center">
   <img src="./assets/readme/hero.png" alt="dsh-us-stocks rendering an AAPL candlestick chart in DeepSeek Harness" width="1200">
 </p>
 
