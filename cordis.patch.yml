@@ -1,5 +1,5 @@
-# DSH US stock market bundle patch. Server-side only — this plugin registers
-# agent tools and ships no browser half.
+# DSH US stock market bundle patch. Registers Host-side agent tools and ships
+# an optional Web Client half that renders get_history as a candlestick chart.
 - insert:
     - id: us-stocks
       name: dsh-us-stocks

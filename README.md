@@ -2,9 +2,13 @@
 
 English | [中文](README.zh.md)
 
-US stock market data tools for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness), powered by [`yahoo-finance2`](https://github.com/gadicc/yahoo-finance2).
+US stock market data tools for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness), powered by [yahoo-finance2](https://github.com/gadicc/yahoo-finance2).
 
 Gives the agent five first-class tools for quotes, price history, financial statements, analyst consensus and news — instead of leaving it to improvise against HTML pages.
+
+<p align="center">
+  <img src="./assets/readme/hero.png" alt="dsh-us-stocks rendering an AAPL candlestick chart in DeepSeek Harness" width="1200">
+</p>
 
 ## Before and after
 
