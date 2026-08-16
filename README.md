@@ -8,7 +8,7 @@ English | [中文](README.zh.md)
 
 US stock market data tools for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness), powered by [yahoo-finance2](https://github.com/gadicc/yahoo-finance2).
 
-Gives the agent five first-class tools for quotes, price history, financial statements, analyst consensus and news — instead of leaving it to improvise against HTML pages.
+Gives the agent six first-class tools for quotes, price history, financial statements, analyst consensus, news and ownership — instead of leaving it to improvise against HTML pages.
 
 <p align="center">
   <img src="./assets/readme/hero.png" alt="dsh-us-stocks rendering an AAPL candlestick chart in DeepSeek Harness" width="1200">
@@ -100,6 +100,7 @@ The plugin registers server-side agent tools. It also ships a small browser half
 | `get_financials` | Income statement, balance sheet and cash flow line items, quarterly or annual, with the reporting currency and trailing-twelve-month ratios |
 | `get_analyst_view` | Consensus rating, buy/hold/sell counts by month, price targets, forward EPS and revenue estimates, recent broker upgrades and downgrades, EPS beat/miss history |
 | `get_news` | Recent headlines with publisher, timestamp and link |
+| `get_ownership` | Insider/institutional split, largest institutional and fund holders with quarterly position changes, and insiders' six-month buying and selling |
 
 ### `get_quote`
 
@@ -190,6 +191,20 @@ ETFs and funds return `no_data`: analysts rate individual companies, so a fund n
 Headline metadata only. Article bodies are not fetched. Upstream returns at most 10 headlines regardless of what is requested, so 10 is both the default and the ceiling.
 
 **Only headlines that actually reference the symbol are returned.** The upstream news search matches text, so a ticker that is also an ordinary word pulls in unrelated stories — searching `ALL` returned a Finnish bank's tender offer and a mineral resource update, `KEY` returned UK property filings, none of which mention Allstate or KeyCorp. Results are filtered against each article's related-tickers list, and when the symbol pass comes up short the company name is searched as well. That recovered `ALL` from 0 of 6 relevant to 6 of 6, and `KEY` likewise. The number of discarded headlines is reported as a warning; if every match is noise the tool fails with `no_data` and says so, rather than returning plausible-looking articles about other companies.
+
+### `get_ownership`
+
+| Parameter | Type | Notes |
+|---|---|---|
+| `ticker` | string, required | |
+| `detail` | enum | `summary` (default) or `full` |
+| `limit` | integer | Rows per list, 1-50. Default 10 |
+
+`summary` returns the insider/institutional breakdown, the largest institutional and fund holders, and insiders' aggregate buying and selling over six months. `full` additionally returns individual insider filings and the named insiders with their holdings; those filings are most of the payload, which is why they are opt-in.
+
+Holder figures come from quarterly 13F filings and are as of each row's own `report_date`, not today. `insider_activity` aggregates every insider over the period, so it can be net positive while one well-publicised insider was selling — a distinction restated in `ownership_note`, because a model reconciling this against a news story needs to know the two are different measurements rather than a contradiction.
+
+Institutional and insider filings are made against operating companies, so ETFs and funds return `no_data`. A fund's own holdings are in `get_quote`.
 
 ## Response shape
 

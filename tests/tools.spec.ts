@@ -15,10 +15,10 @@ function fakeClient(overrides: Partial<Record<keyof YahooClient, unknown>>): Yah
 }
 
 describe('createUsStockTools', () => {
-  it('registers the five MVP tools with explicit timeouts', () => {
+  it('registers every tool with an explicit timeout', () => {
     const tools = createUsStockTools('us', fakeClient({}))
     expect(tools.map((tool) => tool.name)).toEqual([
-      'get_quote', 'get_history', 'get_financials', 'get_analyst_view', 'get_news',
+      'get_quote', 'get_history', 'get_financials', 'get_analyst_view', 'get_news', 'get_ownership',
     ])
     for (const tool of tools) {
       expect(tool.timeoutMs).toBe(25_000)

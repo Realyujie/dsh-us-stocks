@@ -41,6 +41,27 @@ All notable changes to this project are documented here. The format follows
   whose reported five-year 12.76% is the annualised form of an 83.95%
   cumulative — read as cumulative it is wrong by a factor of four.
 
+- `get_ownership`, a sixth tool: the insider/institutional split, the largest
+  institutional and fund holders with their quarterly position changes, and
+  insiders' aggregate buying and selling over six months. `detail: "full"`
+  adds individual insider filings and the named insiders; those are most of
+  the payload, so they are opt-in and the summary modules are all that get
+  requested otherwise.
+
+  Measured before building it — asked "have insiders been buying or selling"
+  and "who is buying this stock", the agent made no plugin call and ran 11
+  `web_search` calls across six steps, 102.5s for the two questions. It
+  arrived at 65.7% institutional ownership from a scraped page dated five
+  weeks earlier against Yahoo's 68.85%, never mentioned the 8.87% insiders
+  hold, and built "insiders are selling" out of one large filing while the
+  six-month aggregate was net +456,643 shares.
+
+  `ownership_note` states that holder rows are as of their own `report_date`
+  and that the six-month aggregate can be net positive while one insider was
+  visibly selling — the reconciliation a model would otherwise have to guess
+  at. Filings are made against operating companies, so ETFs and funds return
+  `no_data` pointing at `get_quote` for a fund's own holdings.
+
 ### Fixed
 
 - `get_analyst_view` relayed upstream's "No fundamentals data found for

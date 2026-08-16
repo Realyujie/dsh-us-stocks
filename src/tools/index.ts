@@ -5,6 +5,7 @@ import { createGetHistoryTool } from './get-history.ts'
 import { createGetFinancialsTool } from './get-financials.ts'
 import { createGetAnalystViewTool } from './get-analyst-view.ts'
 import { createGetNewsTool } from './get-news.ts'
+import { createGetOwnershipTool } from './get-ownership.ts'
 
 export function createUsStockTools(market: string, client: YahooClient): ToolDefinition[] {
   return [
@@ -13,5 +14,6 @@ export function createUsStockTools(market: string, client: YahooClient): ToolDef
     createGetFinancialsTool(market, client),
     createGetAnalystViewTool(market, client),
     createGetNewsTool(market, client),
+    createGetOwnershipTool(market, client),
   ]
 }
