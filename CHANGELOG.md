@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-17
+
 ### Added
 
 - `get_quote` returns fund detail for ETFs and mutual funds: expense ratio
@@ -76,6 +78,15 @@ All notable changes to this project are documented here. The format follows
   It now explains that analysts rate companies and funds therefore carry no
   ratings, targets or estimates, matching how `get_financials` already answers
   the same question about statements.
+
+### Notes
+
+- `^0.2.0` does not admit 0.3.0 under semver's caret rule for `0.x`, so
+  `dsh plugin update` will not pick this release up. Install it explicitly:
+
+  ```bash
+  dsh plugin --profile web add dsh-us-stocks@0.3.0
+  ```
 
 ## [0.2.0] - 2026-08-15
 
@@ -181,6 +192,7 @@ Initial release. US equities only.
   only a handful of income-statement fields and lagged by one reporting period
   since late 2024.
 
-[Unreleased]: https://github.com/Realyujie/dsh-us-stocks/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Realyujie/dsh-us-stocks/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Realyujie/dsh-us-stocks/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Realyujie/dsh-us-stocks/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Realyujie/dsh-us-stocks/releases/tag/v0.1.0

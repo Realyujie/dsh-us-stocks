@@ -1,6 +1,6 @@
 {
   "name": "dsh-us-stocks",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "DSH US stock market data plugin, powered by yahoo-finance2",
   "license": "MIT",
   "repository": {
