@@ -2,11 +2,17 @@
 
 [English](README.md) | 中文
 
+<p align="center">
+  <img src="./assets/readme/cover.png" alt="dsh-us-stocks 封面" width="300">
+</p>
+
 给 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 用的美股行情数据插件，基于 [yahoo-finance2](https://github.com/gadicc/yahoo-finance2)。
 
 提供行情、历史 K 线、财务报表、分析师共识、新闻五个专用工具，无需模型自行解析网页。
 
-
+<p align="center">
+  <img src="./assets/readme/hero.png" alt="dsh-us-stocks 在 DeepSeek Harness 中渲染 AAPL K 线图" width="1200">
+</p>
 
 ## 效果对比
 
