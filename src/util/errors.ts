@@ -110,6 +110,13 @@ export function classify(error: unknown): FailureBody {
   // resolved fine and simply has no such dataset, which an ETF never will.
   else if (/no\s+\w+\s+data found for symbol/.test(lowered)) kind = 'no_data'
   else if (lowered.includes('not found') || lowered.includes('no data found') || lowered.includes('404')) kind = 'unknown_symbol'
+  // Yahoo's chart endpoint rejects an interval/range combination it cannot
+  // serve — e.g. hourly bars requested more than 730 days back — with a
+  // message shaped "{interval} data not available for startTime=... The
+  // requested range must be within the last N days." Retrying the identical
+  // call fails identically; the caller must narrow the range or use a
+  // coarser interval, which is what invalid_argument means here.
+  else if (lowered.includes('data not available for starttime')) kind = 'invalid_argument'
   else if (
     lowered.includes('set-cookie')
     || lowered.includes('crumb')

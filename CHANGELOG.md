@@ -6,6 +6,55 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-15
+
+### Added
+
+- Candlestick chart for `get_history` in the Web UI. The call's result card is
+  drawn by a browser half this release adds: bodies, wicks, a volume band,
+  price gridlines, date labels and per-bar OHLC on hover. It reads the tool's
+  own returned payload rather than fetching a second copy, so the picture and
+  the numbers the model saw cannot drift apart. Colours come from the host's
+  theme tokens, green rising and red falling — the US convention.
+
+  Chart labels follow the host language, English or Chinese. Text from the
+  data source is shown verbatim in either locale: those messages are written
+  for the model as much as for the reader, and translating one audience's copy
+  would split what the two see.
+
+  The chart is additive: a TUI or headless profile has no browser half, and
+  every tool behaves exactly as before there.
+
+- `get_history` accepts `interval: "1h"`, covering about 5 weeks per call.
+  Hourly bars carry a full ISO timestamp in `date` rather than the `1d`/`1wk`/
+  `1mo` `yyyy-MM-dd` — several bars share a calendar day at that granularity,
+  and a date-only label collapsed them onto one indistinguishable value.
+  Upstream separately refuses `1h` history older than about 730 days
+  regardless of the requested window; that now surfaces as `invalid_argument`
+  rather than the generic `internal` a free-text Yahoo error fell into before.
+
+- `get_history` responses carry a `chart_note` telling the model that a Web UI
+  call already rendered a chart. Observed without it: the model called the
+  tool, a chart rendered, and — unaware the request was already satisfied —
+  it spent a minute installing `matplotlib` into a virtualenv to draw a
+  second one from the same data.
+
+### Fixed
+
+- `get_history`'s description claimed it returns "no chart image", written
+  before the chart existed and left uncorrected when it shipped. The model
+  had no way to know a call it was about to make would already satisfy a
+  request to see a chart.
+
+### Notes
+
+- `^0.1.0` does not admit 0.2.0 under semver's caret rule for `0.x`, so
+  `dsh plugin update` will not pick this release up. Install it explicitly:
+
+  ```bash
+  dsh plugin --profile web add dsh-us-stocks@0.2.0
+  ```
+
 ## [0.1.0] - 2026-08-14
 
 Initial release. US equities only.
@@ -61,5 +110,6 @@ Initial release. US equities only.
   only a handful of income-statement fields and lagged by one reporting period
   since late 2024.
 
-[Unreleased]: https://github.com/Realyujie/dsh-us-stocks/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Realyujie/dsh-us-stocks/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/Realyujie/dsh-us-stocks/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Realyujie/dsh-us-stocks/releases/tag/v0.1.0

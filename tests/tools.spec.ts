@@ -177,6 +177,65 @@ describe('get_history', () => {
     expect(result.warnings?.[0]).toMatch(/most recent 2 of 3/)
   })
 
+  it('keeps a full timestamp for hourly bars instead of collapsing them onto one date', async () => {
+    // Same calendar day, four distinct hours — the historical shapeBar()
+    // sliced every bar's date to 10 characters, which made all four collide
+    // on "2026-08-13" and made first_bar_date/last_bar_date indistinguishable.
+    const sameDay = [
+      { date: new Date('2026-08-13T13:30:00Z'), close: 1 },
+      { date: new Date('2026-08-13T14:30:00Z'), close: 2 },
+      { date: new Date('2026-08-13T15:30:00Z'), close: 3 },
+      { date: new Date('2026-08-13T16:30:00Z'), close: 4 },
+    ]
+    const client = fakeClient({ chart: async () => ({ meta: {}, quotes: sameDay }) })
+
+    const result = await getHistory('us', client, { ticker: 'AAPL', interval: '1h' })
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+
+    const dates = (result.data.bars as Record<string, unknown>[]).map((b) => b.date)
+    expect(new Set(dates).size).toBe(4)
+    expect(dates[0]).toBe('2026-08-13T13:30:00.000Z')
+    expect(result.data.first_bar_date).not.toBe(result.data.last_bar_date)
+  })
+
+  it('keeps daily bars date-only, unaffected by the hourly timestamp change', async () => {
+    const client = fakeClient({ chart: async () => ({ meta: {}, quotes: bars }) })
+    const result = await getHistory('us', client, { ticker: 'AAPL', interval: '1d' })
+    if (!result.ok) return
+    expect((result.data.bars as Record<string, unknown>[])[0].date).toBe('2026-08-11')
+  })
+
+  it('recommends 1d as the coarser interval once hourly bars outgrow the budget', async () => {
+    const many = Array.from({ length: 900 }, (_, index) => ({
+      date: new Date(Date.UTC(2026, 0, 1, index)),
+      close: 1.5,
+    }))
+    const client = fakeClient({ chart: async () => ({ meta: {}, quotes: many }) })
+
+    const result = await getHistory('us', client, { ticker: 'AAPL', interval: '1h' })
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.warnings?.[0]).toMatch(/interval: "1d"/)
+  })
+
+  it('classifies an interval/range combination Yahoo refuses as invalid_argument, not internal', async () => {
+    // The real message shape Yahoo returns for hourly bars requested too far
+    // back — this used to fall through classify() to 'internal', which tells
+    // the model nothing actionable.
+    const client = fakeClient({
+      chart: async () => {
+        throw new Error(
+          '1h data not available for startTime=345479400 and endTime=1786858864. '
+          + 'The requested range must be within the last 730 days.',
+        )
+      },
+    })
+
+    const result = await getHistory('us', client, { ticker: 'AAPL', interval: '1h', range: 'max' })
+    expect(result).toMatchObject({ ok: false, error: { kind: 'invalid_argument', retryable: false } })
+  })
+
   it('states both price adjustment bases so they are not conflated', async () => {
     const client = fakeClient({ chart: async () => ({ meta: {}, quotes: bars }) })
     const result = await getHistory('us', client, { ticker: 'TTMI' })

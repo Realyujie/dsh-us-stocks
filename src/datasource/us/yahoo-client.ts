@@ -16,7 +16,7 @@ export type FundamentalsModule = 'financials' | 'balance-sheet' | 'cash-flow'
 export interface ChartRequest {
   readonly period1: string | Date
   readonly period2?: string | Date
-  readonly interval: '1d' | '1wk' | '1mo'
+  readonly interval: '1h' | '1d' | '1wk' | '1mo'
 }
 
 export interface YahooClientOptions {

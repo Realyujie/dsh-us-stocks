@@ -1,6 +1,6 @@
 {
   "name": "dsh-us-stocks",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "DSH US stock market data plugin, powered by yahoo-finance2",
   "license": "MIT",
   "repository": {
@@ -19,19 +19,29 @@
       "types": "./lib/types/index.d.ts",
       "default": "./lib/index.js"
     },
+    "./client": "./lib/client.js",
     "./cordis.patch.yml": "./cordis.patch.yml",
     "./package.json": "./package.json"
   },
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-locale"
+      ]
     }
   },
   "scripts": {
     "clean": "node scripts/clean.mjs",
     "build": "node scripts/build.mjs",
-    "typecheck": "npm run typecheck:src && npm run typecheck:tests",
+    "typecheck": "npm run typecheck:src && npm run typecheck:client && npm run typecheck:tests",
     "typecheck:src": "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
+    "typecheck:client": "node node_modules/typescript/bin/tsc -p tsconfig.client.json --noEmit",
     "typecheck:tests": "node node_modules/typescript/bin/tsc -p tsconfig.test.json --noEmit",
     "test": "NODE_ENV=test node node_modules/vitest/vitest.mjs run tests",
     "test:live": "node scripts/smoke-yahoo.mjs",
@@ -43,11 +53,29 @@
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.1-rc.4",
+    "@deepseek-ai/dsh-client-locale": ">=0.1.0-rc.6 <0.2.0",
+    "@deepseek-ai/dsh-client-runtime": ">=0.1.0-rc.6 <0.2.0",
+    "@deepseek-ai/dsh-client-ui-slots": ">=0.1.0-rc.6 <0.2.0",
+    "@deepseek-ai/dsh-client-ui-tool": ">=0.1.0-rc.6 <0.2.0",
     "@deepseek-ai/dsh-tools": ">=0.0.1-rc.5 <0.1.0 || >=0.1.0-rc.1 <0.2.0",
-    "@deepseek-ai/schemastery": "^3.18.1-rc.4"
+    "@deepseek-ai/schemastery": "^3.18.1-rc.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "peerDependenciesMeta": {
     "@deepseek-ai/cordis": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-locale": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-runtime": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-ui-slots": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-ui-tool": {
       "optional": true
     },
     "@deepseek-ai/dsh-tools": {
@@ -55,13 +83,28 @@
     },
     "@deepseek-ai/schemastery": {
       "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
     }
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "4.0.1",
+    "@deepseek-ai/dsh-client-locale": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-client-runtime": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-client-ui-slots": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-client-ui-tool": "0.1.0-rc.6",
     "@deepseek-ai/dsh-tools": "0.1.0-rc.6",
     "@deepseek-ai/schemastery": "3.18.1",
     "@types/node": "22.20.0",
+    "@types/react": "18.3.31",
+    "@types/react-dom": "18.3.7",
+    "esbuild": "0.25.12",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "typescript": "6.0.3",
     "vitest": "4.1.8"
   },

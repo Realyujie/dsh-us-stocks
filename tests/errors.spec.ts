@@ -16,6 +16,9 @@ describe('classify', () => {
     // A valid symbol that simply does not carry the dataset, e.g. an ETF.
     ['No fundamentals data found for symbol: SPY', 'no_data', false],
     ['No earnings data found for symbol: XYZ', 'no_data', false],
+    // Yahoo rejecting an interval/range combination it will not serve, e.g.
+    // hourly bars requested more than 730 days back.
+    ['1h data not available for startTime=123 and endTime=456. The requested range must be within the last 730 days.', 'invalid_argument', false],
     ['The operation timed out', 'timeout', true],
     ['something completely unexpected', 'internal', false],
   ])('maps %j to %s', (message, kind, retryable) => {

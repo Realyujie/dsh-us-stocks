@@ -3,8 +3,16 @@
   "compilerOptions": {
     "noEmit": true,
     "rootDir": ".",
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src", "tests"],
-  "exclude": ["lib"]
+  "include": [
+    "src",
+    "tests"
+  ],
+  "exclude": [
+    "lib",
+    "src/client"
+  ]
 }

@@ -81,7 +81,7 @@ dsh plugin --profile web add link:/absolute/path/to/dsh-us-stocks
 
 `dsh plugin` 是转发给 profile 目录下的 pnpm，并会同步维护 profile 的 `dsh.profile.bundles` 列表，不需要手动注册。
 
-本插件只注册服务端的 agent 工具，不含任何浏览器 UI。
+本插件注册服务端的 agent 工具，同时附带一个很小的浏览器半边，用于绘制 `get_history` 一节所述的 K 线图；在 TUI 或 headless profile 下该半边不存在，五个工具照常可用。
 
 ## 工具
 
@@ -112,10 +112,16 @@ dsh plugin --profile web add link:/absolute/path/to/dsh-us-stocks
 | `ticker` | string，必填 | |
 | `range` | 枚举 | `5d` `1mo` `3mo` `6mo` `1y` `2y` `5y` `10y` `max`，默认 `1y` |
 | `start_date` / `end_date` | string | `yyyy-MM-dd`，指定 `start_date` 时覆盖 `range` |
-| `interval` | 枚举 | `1d` `1wk` `1mo`，默认 `1d`。单次调用 `1d` 约覆盖 2 年，`1wk` 约 8 年，`1mo` 约 35 年 |
+| `interval` | 枚举 | `1h` `1d` `1wk` `1mo`，默认 `1d`。单次调用 `1h` 约覆盖 5 周，`1d` 约 2 年，`1wk` 约 8 年，`1mo` 约 35 年 |
 | `limit` | 整数 | 保留最近 N 根，1–500。默认返回窗口内全部 |
 
-K 线按时间从旧到新排列。本工具不渲染图表，图形化由调用方负责。
+K 线按时间从旧到新排列。`1d`/`1wk`/`1mo` 的 `date` 是 `yyyy-MM-dd`；`1h` 则是完整 ISO 时间戳——这个粒度下同一天会有多根 K 线，若只保留日期会让它们的标签全部相同。
+
+`interval: "1h"` 另受上游限制，历史最多回溯约 730 天，与请求窗口大小无关。`range` 或 `start_date` 超出这个范围会直接返回 `invalid_argument`，而不是其他档位那种"已裁剪"的警告——因为 Yahoo 对此是直接拒绝整个请求，而非退而求其次给一部分数据。
+
+在 Web UI 中，该调用会渲染成 K 线图——蜡烛实体、上下影线、成交量副图、价格网格线，鼠标悬停显示当根 OHLC——所用数据与模型收到的完全是同一份，因此图与数字不会出现分歧。配色跟随宿主主题，绿涨红跌。图表文案跟随宿主语言（中文或英文）；来自数据源的消息按原文显示，因为那些文字同时也是写给模型看的。在其他客户端则显示宿主的通用结果卡片，工具输出本身没有区别。
+
+每次响应都带一条 `chart_note` 说明这件事——因为模型决定下一步做什么时读的是返回的数据，而不是调用时读过的工具描述。没有这条提示时，实测出现过模型在 Web UI 里已经拿到图表、却毫不知情，转身花了一分钟装 `matplotlib`、建虚拟环境，想再画一张。
 
 落在返回窗口内的分红和拆股以 `dividends`、`splits` 返回；从未分红或拆股的标的不会出现这两个键。
 
@@ -246,6 +252,7 @@ src/
 ├── datasource/us/
 │   └── yahoo-client.ts         yahoo-finance2 封装：缓存、取消、错误定型
 ├── tools/                      每个工具一个文件，另有共用的数据整形辅助函数
+├── client/                     浏览器半边：get_history 的 K 线卡片
 └── util/
     ├── cache.ts                短 TTL 缓存，含并发请求合并
     ├── errors.ts               失败分类与信封

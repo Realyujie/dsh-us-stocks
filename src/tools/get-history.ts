@@ -5,7 +5,7 @@ import { MAX_TOOL_OUTPUT_CHARACTERS, stringify } from '../util/stringify.ts'
 import { compact, isoDate, jsonOutput, num, round, str, tickerSchema, TOOL_TIMEOUT_MS } from './shared.ts'
 
 const RANGES = ['5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'max'] as const
-const INTERVALS = ['1d', '1wk', '1mo'] as const
+const INTERVALS = ['1h', '1d', '1wk', '1mo'] as const
 
 /**
  * Ceiling on the `limit` argument. 500 daily bars is about two years; longer
@@ -26,7 +26,7 @@ const MAX_LIMIT = 500
 const SAFE_OUTPUT_CHARACTERS = Math.floor(MAX_TOOL_OUTPUT_CHARACTERS * 0.85)
 
 /** Coarser interval to recommend when a request outgrows the bar cap. */
-const COARSER: Partial<Record<Interval, Interval>> = { '1d': '1wk', '1wk': '1mo' }
+const COARSER: Partial<Record<Interval, Interval>> = { '1h': '1d', '1d': '1wk', '1wk': '1mo' }
 
 type Range = typeof RANGES[number]
 type Interval = typeof INTERVALS[number]
@@ -45,7 +45,10 @@ export function createGetHistoryTool(market: string, client: YahooClient): ToolD
     name: 'get_history',
     description:
       'Get historical OHLCV bars for a US stock, plus any dividends and splits in the window. '
-      + 'Returns structured data points only — no chart image. '
+      + 'The response itself is structured data, not an image — but in the Web UI, calling this tool renders '
+      + 'a candlestick chart with a volume band in place of the generic result card, drawn from this same data. '
+      + 'Call it when the user wants to see price action, not just read the numbers; a TUI or headless client '
+      + 'shows the plain data instead, with no loss of information either way. '
       + 'Use `range` for a trailing window, or `start_date`/`end_date` for an explicit one. Bars run oldest to newest. '
       + 'IMPORTANT — the two price bases differ: `open`/`high`/`low`/`close` are adjusted for splits only, '
       + 'while `adj_close` is adjusted for splits and dividends. Compare like with like; do not mix them in one calculation. '
@@ -64,9 +67,10 @@ export function createGetHistoryTool(market: string, client: YahooClient): ToolD
         enum: INTERVALS,
         // Stated as a rule the model can apply before calling: picking the
         // interval after hitting the truncation warning costs a second round trip.
-        description: 'Bar size. Default "1d". Match it to the window: "1d" covers about 2 years, '
+        description: 'Bar size. Default "1d". Match it to the window: "1h" covers about 5 weeks, "1d" about 2 years, '
           + '"1wk" about 8 years, "1mo" about 35 years. A window longer than the chosen interval '
-          + 'can carry is trimmed to the most recent bars.',
+          + 'can carry is trimmed to the most recent bars. The upstream source separately refuses "1h" data '
+          + 'older than about 730 days regardless of window size.',
       },
       limit: {
         type: 'integer' as const,
@@ -102,7 +106,7 @@ export async function getHistory(
     }
 
     const bars = rawQuotes
-      .map(shapeBar)
+      .map((bar) => shapeBar(bar, request.interval))
       .filter((bar): bar is Record<string, unknown> => bar !== undefined)
 
     const build = (window: Record<string, unknown>[]): Record<string, unknown> => {
@@ -114,6 +118,16 @@ export async function getHistory(
         interval: request.interval,
         // Stated explicitly because the two bases are not interchangeable.
         price_adjustment: { ohlc: 'split-adjusted', adj_close: 'split-and-dividend-adjusted' },
+        // Placed in the data, not just the tool description, because a model
+        // deciding whether to build its own chart is reading this response, not
+        // the description read at call time. Observed without it: the model
+        // called this tool, a chart rendered, and it then spent a minute
+        // installing matplotlib into a venv to draw a second one — unaware the
+        // first request was already satisfied. Hedged because the server has no
+        // way to know whether the connected client is the Web UI.
+        chart_note: 'If the client is the DSH Web UI, this call already rendered a candlestick chart for the '
+          + 'user in place of the generic result card. Do not build a separate chart from this data unless '
+          + 'something the built-in chart cannot show is specifically needed.',
         bar_count: window.length,
         first_bar_date: first,
         last_bar_date: last,
@@ -272,7 +286,7 @@ function resolveLimit(limit: number | undefined): number {
   return limit
 }
 
-function shapeBar(raw: unknown): Record<string, unknown> | undefined {
+function shapeBar(raw: unknown, interval: Interval): Record<string, unknown> | undefined {
   if (typeof raw !== 'object' || raw === null) return undefined
   const bar = raw as Record<string, unknown>
   const date = isoDate(bar.date)
@@ -280,7 +294,12 @@ function shapeBar(raw: unknown): Record<string, unknown> | undefined {
   // Yahoo emits placeholder rows with null OHLC on non-trading days.
   if (date === undefined || close === undefined) return undefined
   return compact({
-    date: date.slice(0, 10),
+    // Daily bars and coarser carry no meaningful time of day, so they stay
+    // date-only as every response did before hourly bars existed. Hourly bars
+    // keep the full timestamp: slicing it to a date collapsed a whole trading
+    // day's worth of bars onto one identical date string, which also broke
+    // first_bar_date/last_bar_date and the client's per-candle x-axis labels.
+    date: interval === '1h' ? date : date.slice(0, 10),
     open: round(bar.open, 4),
     high: round(bar.high, 4),
     low: round(bar.low, 4),

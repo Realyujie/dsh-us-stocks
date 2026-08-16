@@ -81,7 +81,7 @@ dsh plugin --profile web add link:/absolute/path/to/dsh-us-stocks
 
 `dsh plugin` forwards to pnpm inside the profile directory and keeps the profile's `dsh.profile.bundles` list in step, so no manual registration is needed.
 
-The plugin registers server-side agent tools only. It ships no browser UI.
+The plugin registers server-side agent tools. It also ships a small browser half that draws the candlestick chart described under `get_history`; in a TUI or headless profile that half is simply absent and every tool still works.
 
 ## Tools
 
@@ -112,10 +112,16 @@ Analyst ratings are deliberately not part of this tool even though upstream retu
 | `ticker` | string, required | |
 | `range` | enum | `5d` `1mo` `3mo` `6mo` `1y` `2y` `5y` `10y` `max`. Default `1y` |
 | `start_date` / `end_date` | string | `yyyy-MM-dd`; `start_date` overrides `range` |
-| `interval` | enum | `1d` `1wk` `1mo`. Default `1d`. One call covers ~2 years at `1d`, ~8 at `1wk`, ~35 at `1mo` |
+| `interval` | enum | `1h` `1d` `1wk` `1mo`. Default `1d`. One call covers ~5 weeks at `1h`, ~2 years at `1d`, ~8 at `1wk`, ~35 at `1mo` |
 | `limit` | integer | Keep the most recent N bars, 1–500. Defaults to every bar in the window |
 
-Bars are ordered oldest to newest. No chart is rendered — visualisation is the caller's job.
+Bars are ordered oldest to newest. `date` is `yyyy-MM-dd` for `1d`/`1wk`/`1mo`, and a full ISO instant for `1h` — several bars share a calendar day at that granularity, so a date-only label would print the same value for all of them.
+
+`interval: "1h"` is separately capped by the upstream source at about 730 days of history, regardless of the requested window. A `range` or `start_date` older than that fails with `invalid_argument` rather than the truncation warning the other intervals get, since Yahoo refuses the request outright instead of returning a partial one.
+
+In the Web UI the call renders as a candlestick chart — bodies, wicks, a volume band, price gridlines and per-bar OHLC on hover — drawn from the same payload the model receives, so the picture and the numbers cannot disagree. Colours follow the host theme, green rising and red falling. Chart labels follow the host language, English or Chinese; messages from the data source are shown verbatim, since they are written for the model as well as the reader. Elsewhere the call shows the host's generic result card; the tool's output is identical either way.
+
+Every response carries a `chart_note` explaining this, because the model reads the returned data when deciding what to do next, not the tool description it read at call time. Without it, a model that got a chart in the Web UI has been observed spending a minute installing `matplotlib` into a virtualenv to build a second one, unaware the request was already satisfied.
 
 Dividends and splits falling inside the returned window come back as `dividends` and `splits`; both keys are absent for symbols that have never paid or split.
 
@@ -246,6 +252,7 @@ src/
 ├── datasource/us/
 │   └── yahoo-client.ts         yahoo-finance2 wrapper: caching, cancellation, error typing
 ├── tools/                      one file per tool, plus shared shaping helpers
+├── client/                     browser half: the candlestick card for get_history
 └── util/
     ├── cache.ts                short-TTL cache with in-flight de-duplication
     ├── errors.ts               failure taxonomy and envelopes
