@@ -11,7 +11,7 @@ US stock market data tools for [DeepSeek Harness](https://github.com/deepseek-ai
 Gives the agent six first-class tools for quotes, price history, financial statements, analyst consensus, news and ownership — instead of leaving it to improvise against HTML pages.
 
 <p align="center">
-  <img src="./assets/readme/overview.svg" alt="Six tools for one ticker: quote, history, financials, analyst view, news, ownership. Same AAPL task: 31 calls in 213s without the plugin, 6 calls in 3.1s with it." width="960">
+  <img src="./assets/readme/overview.svg" alt="Six tools for one ticker: quote, history, financials, analyst view, news, ownership. Same AAPL task: 31 calls in 213s without the plugin, 5 calls in 33s with it." width="960">
 </p>
 
 ## Before and after
@@ -25,7 +25,7 @@ One agent turn, same question, same model, same machine — the only variable is
 | Wall clock | 213.5s | 33.2s |
 | What it called | 16 × `web_search`, 15 × `bash` | one call to each tool the task needed |
 
-With no market-data tool available, the agent falls back on web search and shell commands, fetching and parsing one page at a time. Most of the remaining 33 seconds is model inference, which no plugin controls; data retrieval itself is 3.1s.
+With no market-data tool available, the agent falls back on web search and shell commands, fetching and parsing one page at a time. Most of the remaining 33 seconds is model inference, which no plugin controls; data retrieval itself is 2.6s.
 
 <details>
 <summary>Acceptance benchmark — AAPL</summary>
