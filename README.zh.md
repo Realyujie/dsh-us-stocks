@@ -1,5 +1,11 @@
 # dsh-us-stocks
 
+[![npm](https://img.shields.io/npm/v/dsh-us-stocks)](https://www.npmjs.com/package/dsh-us-stocks)
+[![license](https://img.shields.io/github/license/Realyujie/dsh-us-stocks)](LICENSE)
+[![node](https://img.shields.io/node/v/dsh-us-stocks)](https://www.npmjs.com/package/dsh-us-stocks)
+[![dsh-plugin](https://img.shields.io/badge/topic-dsh--plugin-orange)](https://github.com/topics/dsh-plugin)
+[![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com)
+
 [English](README.md) | 中文
 
 <p align="center">
