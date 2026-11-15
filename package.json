@@ -1,6 +1,6 @@
 {
   "name": "dsh-us-stocks",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "DSH US stock market data plugin, powered by yahoo-finance2",
   "license": "MIT",
   "repository": {
@@ -30,7 +30,7 @@
     "client": {
       "platform": "web",
       "inject": [
-        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-renderer",
         "@deepseek-ai/dsh-client-ui-slots",
         "@deepseek-ai/dsh-client-locale"
       ]
@@ -52,13 +52,13 @@
     "yahoo-finance2": "^4.0.2"
   },
   "peerDependencies": {
-    "@deepseek-ai/cordis": "^4.0.1-rc.4",
-    "@deepseek-ai/dsh-client-locale": ">=0.1.0-rc.6 <0.2.0",
-    "@deepseek-ai/dsh-client-runtime": ">=0.1.0-rc.6 <0.2.0",
-    "@deepseek-ai/dsh-client-ui-slots": ">=0.1.0-rc.6 <0.2.0",
-    "@deepseek-ai/dsh-client-ui-tool": ">=0.1.0-rc.6 <0.2.0",
-    "@deepseek-ai/dsh-tools": ">=0.0.1-rc.5 <0.1.0 || >=0.1.0-rc.1 <0.2.0",
-    "@deepseek-ai/schemastery": "^3.18.1-rc.4",
+    "@deepseek-ai/cordis": "^4.1.0",
+    "@deepseek-ai/dsh-client-locale": ">=0.2.2-rc.3 <0.3.0-0",
+    "@deepseek-ai/dsh-client-ui-renderer": ">=0.2.2-rc.3 <0.3.0-0",
+    "@deepseek-ai/dsh-client-ui-slots": ">=0.2.2-rc.3 <0.3.0-0",
+    "@deepseek-ai/dsh-client-ui-tool": ">=0.2.2-rc.3 <0.3.0-0",
+    "@deepseek-ai/dsh-tools": ">=0.2.2-rc.3 <0.3.0-0",
+    "@deepseek-ai/schemastery": "^3.19.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -69,7 +69,7 @@
     "@deepseek-ai/dsh-client-locale": {
       "optional": true
     },
-    "@deepseek-ai/dsh-client-runtime": {
+    "@deepseek-ai/dsh-client-ui-renderer": {
       "optional": true
     },
     "@deepseek-ai/dsh-client-ui-slots": {
@@ -92,13 +92,13 @@
     }
   },
   "devDependencies": {
-    "@deepseek-ai/cordis": "4.0.1",
-    "@deepseek-ai/dsh-client-locale": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-client-runtime": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-client-ui-slots": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-client-ui-tool": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-tools": "0.1.0-rc.6",
-    "@deepseek-ai/schemastery": "3.18.1",
+    "@deepseek-ai/cordis": "4.1.0",
+    "@deepseek-ai/dsh-client-locale": "0.2.2-rc.3",
+    "@deepseek-ai/dsh-client-ui-renderer": "0.2.2-rc.3",
+    "@deepseek-ai/dsh-client-ui-slots": "0.2.2-rc.3",
+    "@deepseek-ai/dsh-client-ui-tool": "0.2.2-rc.3",
+    "@deepseek-ai/dsh-tools": "0.2.2-rc.3",
+    "@deepseek-ai/schemastery": "3.19.0",
     "@types/node": "22.20.0",
     "@types/react": "18.3.31",
     "@types/react-dom": "18.3.7",
