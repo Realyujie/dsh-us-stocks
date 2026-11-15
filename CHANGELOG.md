@@ -6,6 +6,23 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-11-15
+
+### Changed
+
+- Targets DSH 0.2 (`>=0.2.2-rc.3 <0.3.0-0`). 0.3.0 declared every DSH peer
+  as `<0.2.0`, so DSH 0.2.2-rc.3 refused to install it ("installation
+  rejected ... is incompatible with dsh"). DSH checks each `@deepseek-ai/dsh-*`
+  peer against its own runtime version with prereleases included, which is why
+  the upper bound is `<0.3.0-0`: a plain `<0.3.0` would have admitted
+  `0.3.0-rc.*`. DSH 0.1 hosts should stay on 0.3.0.
+- The browser half no longer depends on `@deepseek-ai/dsh-client-runtime`,
+  which DSH 0.2 stopped shipping. `ctx.slots` now comes from
+  `@deepseek-ai/dsh-client-ui-renderer`, and the client context is cordis's own
+  `Context`. The slot API the chart uses is unchanged.
+- Built against cordis 4.1 and schemastery 3.19, which the DSH 0.2 packages
+  require.
+
 ## [0.3.0] - 2026-08-17
 
 ### Added
@@ -192,7 +209,8 @@ Initial release. US equities only.
   only a handful of income-statement fields and lagged by one reporting period
   since late 2024.
 
-[Unreleased]: https://github.com/Realyujie/dsh-us-stocks/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/Realyujie/dsh-us-stocks/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/Realyujie/dsh-us-stocks/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Realyujie/dsh-us-stocks/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Realyujie/dsh-us-stocks/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Realyujie/dsh-us-stocks/releases/tag/v0.1.0

@@ -1,7 +1,10 @@
-// Side-effect-free import for its module augmentation: this is what puts
-// `locale` on the context type.
+// Side-effect-free imports for their module augmentations: these are what put
+// `locale` and `slots` on the context type. DSH 0.2 dropped
+// dsh-client-runtime; `slots` now comes from the UI renderer, and the client
+// context is cordis's own `Context`.
 import type {} from '@deepseek-ai/dsh-client-locale/client'
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import { HistoryCard } from './HistoryCard.tsx'
 import { bindLocale } from './locale.ts'
 
